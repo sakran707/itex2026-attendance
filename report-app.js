@@ -32,6 +32,14 @@ function badge(type) {
   return `<span class="badge ${type}">${TYPE_LABELS[type]}</span>`;
 }
 
+/** Council members have no individual title in the roster data — fall back
+ * to a generic "council member" label instead of showing nothing. */
+function displayTitle(m) {
+  if (m.position_title) return m.position_title;
+  if (m.category === 'council') return 'عضو مجلس نقابة';
+  return null;
+}
+
 function buildSummary(roster) {
   const summary = {};
   for (const date of EVENT_DATES) {
@@ -55,7 +63,7 @@ function rosterTable(roster) {
         (m, i) => `<tr>
           <td>${i + 1}</td>
           <td style="font-weight:600;">${m.full_name}</td>
-          <td>${m.position_title ?? '—'}</td>
+          <td>${displayTitle(m) ?? '—'}</td>
           ${EVENT_DATES.map((d) => `<td>${badge(m.schedule[d])}</td>`).join('')}
         </tr>`,
       ),

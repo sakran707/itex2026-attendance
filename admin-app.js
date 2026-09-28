@@ -29,6 +29,14 @@ const TYPE_OPTIONS = [
   { value: 'unavailable', label: 'غير متاح', hint: '' },
 ];
 
+/** Council members have no individual title in the roster data — fall back
+ * to a generic "council member" label instead of showing nothing. */
+function displayTitle(m) {
+  if (m.position_title) return m.position_title;
+  if (m.category === 'council') return 'عضو مجلس نقابة';
+  return null;
+}
+
 const app = document.getElementById('app');
 const logoutBtn = document.getElementById('logoutBtn');
 let tab = 'roster';
@@ -130,7 +138,7 @@ function renderRoster() {
               (m) => `
             <tr>
               <td style="font-weight:600;">${m.full_name}</td>
-              <td style="color:#889;">${m.position_title ?? '—'}</td>
+              <td style="color:#889;">${displayTitle(m) ?? '—'}</td>
               ${EVENT_DATES.map((d) => `<td>${badge(m.schedule[d])}</td>`).join('')}
               <td style="color:#aab;">${m.updated_at ? new Date(m.updated_at).toLocaleDateString('ar-IQ') : '—'}</td>
               <td style="white-space:nowrap;">
@@ -207,7 +215,7 @@ function renderEditModal() {
         <div style="display:flex;justify-content:space-between;align-items:flex-start;">
           <div>
             <p style="font-weight:700;margin:0 0 4px;">${member.full_name}</p>
-            <p style="color:#889;font-size:12.5px;margin:0 0 14px;">${member.position_title ?? ''}</p>
+            <p style="color:#889;font-size:12.5px;margin:0 0 14px;">${displayTitle(member) ?? ''}</p>
           </div>
           <button type="button" id="clearAllBtn" style="background:none;border:1px solid #f3caca;color:#c0392b;border-radius:6px;font-size:11px;font-weight:700;padding:5px 8px;cursor:pointer;white-space:nowrap;">مسح الكل</button>
         </div>
@@ -240,7 +248,7 @@ function renderProgress() {
                 المتبقون بدون أي اختيار (${remaining.length})
               </summary>
               <ul style="margin:6px 0 0;padding-inline-start:18px;font-size:12.5px;color:#556;">
-                ${remaining.map((m) => `<li>${m.full_name}${m.position_title ? ` — ${m.position_title}` : ''}</li>`).join('')}
+                ${remaining.map((m) => `<li>${m.full_name}${displayTitle(m) ? ` — ${displayTitle(m)}` : ''}</li>`).join('')}
               </ul>
             </details>`
           : `<p style="margin:8px 0 0;font-size:12.5px;color:var(--ok);font-weight:700;">✓ الجميع سجّلوا حضورهم</p>`

@@ -21,6 +21,14 @@ const TYPE_SHORT = {
   unavailable: { ar: 'غير متاح', en: 'N/A' },
 };
 
+/** Council members have no individual title in the roster data — fall back
+ * to a generic "council member" label instead of showing nothing. */
+function displayTitle(m) {
+  if (m.position_title) return m.position_title;
+  if (m.category === 'council') return isAr() ? 'عضو مجلس نقابة' : 'Council member';
+  return null;
+}
+
 function buildDaySummary(roster, date) {
   const byType = { full_day: [], morning: [], evening: [], unavailable: [] };
   for (const person of roster) {
@@ -159,7 +167,7 @@ function renderPicker() {
             .map(
               (m) => `
             <button type="button" class="person-pick" data-id="${m.id}" style="display:block;width:100%;text-align:${isAr() ? 'right' : 'left'};background:none;border:none;border-bottom:1px solid var(--border);padding:12px 10px;font-size:13.5px;font-weight:600;color:var(--ink);cursor:pointer;">
-              ${m.full_name}${m.position_title ? `<br><span style="font-weight:500;font-size:12px;color:#889;">${m.position_title}</span>` : ''}
+              ${m.full_name}${displayTitle(m) ? `<br><span style="font-weight:500;font-size:12px;color:#889;">${displayTitle(m)}</span>` : ''}
             </button>`,
             )
             .join('')}
@@ -301,7 +309,7 @@ function render() {
       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;">
         <div>
           <p class="person-name">${member.full_name}</p>
-          ${member.position_title ? `<p class="person-role">${member.position_title}</p>` : ''}
+          ${displayTitle(member) ? `<p class="person-role">${displayTitle(member)}</p>` : ''}
         </div>
         <button type="button" id="changePersonBtn" style="background:none;border:none;color:var(--ocean);font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;">${isAr() ? 'لست أنا' : 'Not me'}</button>
       </div>
