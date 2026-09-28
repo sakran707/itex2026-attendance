@@ -55,6 +55,7 @@ let member = null;
 let schedule = {};
 let saved = false;
 let loadError = false;
+let searchTerm = '';
 
 async function load() {
   try {
@@ -65,6 +66,21 @@ async function load() {
   }
   render();
 }
+
+/** Refreshes the shared roster in the background so shift counts stay live
+ * without the person needing to reload the page. Never touches the current
+ * `member`/`schedule` (their own in-progress picks), only the counts shown
+ * for everyone. */
+async function pollRoster() {
+  try {
+    const res = await window.itexStore.fetchRosterWithSha();
+    roster = res.roster;
+    render();
+  } catch {
+    // transient network hiccup — keep showing the last known data
+  }
+}
+setInterval(pollRoster, 15000);
 
 function pickPerson(id) {
   member = roster.find((m) => m.id === id);
@@ -109,9 +125,12 @@ async function save() {
 }
 
 function renderPicker() {
+  const term = searchTerm.trim();
+  const filtered = term ? roster.filter((m) => m.full_name.includes(term)) : roster;
+
   const groups = CATEGORY_ORDER.map((cat) => ({
     cat,
-    members: roster.filter((m) => m.category === cat).sort((a, b) => a.sort_order - b.sort_order),
+    members: filtered.filter((m) => m.category === cat).sort((a, b) => a.sort_order - b.sort_order),
   })).filter((g) => g.members.length);
 
   return `
@@ -121,11 +140,14 @@ function renderPicker() {
       <p class="subtagline">${isAr() ? 'بوث نقابة المبرمجين العراقيين' : 'Iraqi Programmers Syndicate booth'}</p>
     </div>
     <div class="card" style="margin-bottom:18px;">
-      <p style="font-weight:700;font-size:14px;margin:0;">${isAr() ? 'اختر اسمك من القائمة' : 'Select your name from the list'}</p>
+      <p style="font-weight:700;font-size:14px;margin:0 0 8px;">${isAr() ? 'اختر اسمك' : 'Select your name'}</p>
+      <input id="nameSearch" type="text" value="${term.replace(/"/g, '&quot;')}" placeholder="${isAr() ? 'اكتب اسمك...' : 'Type your name...'}"
+        style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;" />
     </div>
-    ${groups
-      .map(
-        (g) => `
+    ${groups.length
+      ? groups
+          .map(
+            (g) => `
       <p class="group-title">${isAr() ? CATEGORY_LABELS[g.cat].ar : CATEGORY_LABELS[g.cat].en}</p>
       <div class="card" style="padding:6px;">
         ${g.members
@@ -137,8 +159,9 @@ function renderPicker() {
           )
           .join('')}
       </div>`,
-      )
-      .join('')}
+          )
+          .join('')
+      : `<p style="text-align:center;color:#889;font-size:13px;">${isAr() ? 'لا يوجد اسم مطابق' : 'No matching name'}</p>`}
   `;
 }
 
@@ -159,6 +182,16 @@ function render() {
     app.querySelectorAll('.person-pick').forEach((btn) => {
       btn.addEventListener('click', () => pickPerson(Number(btn.dataset.id)));
     });
+    const searchInput = document.getElementById('nameSearch');
+    searchInput.addEventListener('input', () => {
+      searchTerm = searchInput.value;
+      render();
+    });
+    if (searchTerm) {
+      searchInput.focus();
+      const pos = searchInput.value.length;
+      searchInput.setSelectionRange(pos, pos);
+    }
     return;
   }
 
