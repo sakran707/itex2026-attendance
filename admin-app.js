@@ -230,9 +230,55 @@ function renderEditModal() {
     </div>`;
 }
 
+// Coverage color scale for the two working shifts (morning/evening) —
+// full_day and unavailable aren't "coverage" concerns so they stay neutral.
+function coverageColor(count) {
+  if (count === 0) return { bg: '#fdecea', fg: '#c0392b', label: 'لا يوجد' };
+  if (count <= 2) return { bg: '#fdf3e0', fg: '#a56a0c', label: 'قليل' };
+  return { bg: '#e6f4ec', fg: 'var(--ok)', label: 'جيد' };
+}
+
+function renderCoverageGlance() {
+  return `
+    <div style="margin-top:12px;">
+      <p style="font-weight:700;font-size:12.5px;margin:0 0 8px;">نظرة سريعة على التغطية — الشفت الصباحي والمسائي</p>
+      <div class="overflow-x">
+        <table style="font-size:11.5px;">
+          <thead>
+            <tr>
+              <th style="white-space:nowrap;">اليوم</th>
+              <th>صباحي</th>
+              <th>مسائي</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${EVENT_DATES.map((date) => {
+              const s = data.summary[date];
+              const cells = ['morning', 'evening']
+                .map((type) => {
+                  const count = (s[type] ?? []).length;
+                  const c = coverageColor(count);
+                  return `<td>
+                    <span style="display:inline-flex;align-items:center;gap:5px;background:${c.bg};color:${c.fg};border-radius:6px;padding:3px 8px;font-weight:700;">
+                      <span class="num">${count}</span> <span style="font-weight:600;">${c.label}</span>
+                    </span>
+                  </td>`;
+                })
+                .join('');
+              return `<tr><td style="font-weight:700;white-space:nowrap;">${DAY_LABELS[date]}</td>${cells}</tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+      <p style="font-size:10.5px;color:#99a;margin:6px 0 0;">🔴 لا يوجد أحد · 🟠 1-2 أشخاص · 🟢 3 أشخاص فأكثر</p>
+    </div>`;
+}
+
 function renderProgress() {
   const registered = data.members.filter((m) => EVENT_DATES.some((d) => m.schedule[d]));
-  const remaining = data.members.filter((m) => EVENT_DATES.every((d) => !m.schedule[d]));
+  const remaining = data.members
+    .filter((m) => EVENT_DATES.every((d) => !m.schedule[d]))
+    .sort((a, b) => a.sort_order - b.sort_order);
 
   return `
     <div class="card" style="margin-top:10px;">
@@ -247,12 +293,18 @@ function renderProgress() {
               <summary style="cursor:pointer;font-size:12.5px;color:var(--ocean);font-weight:700;">
                 المتبقون بدون أي اختيار (${remaining.length})
               </summary>
-              <ul style="margin:6px 0 0;padding-inline-start:18px;font-size:12.5px;color:#556;">
-                ${remaining.map((m) => `<li>${m.full_name}${displayTitle(m) ? ` — ${displayTitle(m)}` : ''}</li>`).join('')}
-              </ul>
+              <ol style="margin:8px 0 0;padding-inline-start:20px;font-size:12.5px;color:#445;display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:4px 12px;">
+                ${remaining
+                  .map(
+                    (m) =>
+                      `<li style="padding:2px 0;">${m.full_name}${displayTitle(m) ? `<br><span style="color:#99a;font-size:11px;">${displayTitle(m)}</span>` : ''}</li>`,
+                  )
+                  .join('')}
+              </ol>
             </details>`
           : `<p style="margin:8px 0 0;font-size:12.5px;color:var(--ok);font-weight:700;">✓ الجميع سجّلوا حضورهم</p>`
       }
+      ${renderCoverageGlance()}
     </div>`;
 }
 
