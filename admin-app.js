@@ -36,6 +36,7 @@ let data = null;
 let editingId = null;
 let editSchedule = null;
 let saving = false;
+let saveRetryAttempt = 0;
 
 const SESSION_KEY = 'itex_admin_session';
 
@@ -212,7 +213,9 @@ function renderEditModal() {
         </div>
         ${dayRows}
         <div style="display:flex;gap:8px;margin-top:12px;">
-          <button class="primary" id="modalSaveBtn" ${saving ? 'disabled' : ''}>${saving ? 'جارٍ الحفظ...' : 'حفظ'}</button>
+          <button class="primary" id="modalSaveBtn" ${saving ? 'disabled' : ''}>${
+    saving ? (saveRetryAttempt > 0 ? 'الخادم مزدحم، جارٍ إعادة المحاولة...' : 'جارٍ الحفظ...') : 'حفظ'
+  }</button>
           <button id="modalCancelBtn" style="flex:0 0 auto;background:#eef0f2;border:none;border-radius:8px;padding:0 16px;font-weight:700;cursor:pointer;">إلغاء</button>
         </div>
       </div>
@@ -276,27 +279,35 @@ function render() {
   });
   document.getElementById('modalSaveBtn')?.addEventListener('click', async () => {
     saving = true;
+    saveRetryAttempt = 0;
     render();
     const id = editingId;
     // Send all 4 dates (including cleared/null ones) so a cleared day actually
     // overwrites the previously saved choice instead of being skipped.
     const days = EVENT_DATES.map((event_date) => ({ event_date, attendance_type: editSchedule[event_date] ?? null }));
     try {
-      await window.itexStore.updateRoster((roster) => {
-        const m = roster.find((r) => r.id === id);
-        if (m) {
-          for (const { event_date, attendance_type } of days) m.schedule[event_date] = attendance_type;
-          m.updated_at = new Date().toISOString();
-        }
-        return roster;
-      });
+      await window.itexStore.updateRoster(
+        (roster) => {
+          const m = roster.find((r) => r.id === id);
+          if (m) {
+            for (const { event_date, attendance_type } of days) m.schedule[event_date] = attendance_type;
+            m.updated_at = new Date().toISOString();
+          }
+          return roster;
+        },
+        (attempt) => {
+          // Several admins/members can be saving at once — retrying is normal, not broken.
+          saveRetryAttempt = attempt;
+          render();
+        },
+      );
       editingId = null;
       editSchedule = null;
       saving = false;
       await loadData();
     } catch {
       saving = false;
-      alert('تعذر الحفظ، حاول مرة أخرى.');
+      alert('تعذر الحفظ بعد عدة محاولات (ازدحام مؤقت). اضغط "حفظ" مرة أخرى.');
       render();
     }
   });

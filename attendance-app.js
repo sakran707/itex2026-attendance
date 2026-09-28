@@ -118,20 +118,30 @@ async function save() {
   const id = member.id;
   const days = EVENT_DATES.map((event_date) => ({ event_date, attendance_type: schedule[event_date] }));
   try {
-    const updated = await window.itexStore.updateRoster((r) => {
-      const m = r.find((x) => x.id === id);
-      if (m) {
-        for (const { event_date, attendance_type } of days) m.schedule[event_date] = attendance_type;
-        m.updated_at = new Date().toISOString();
-      }
-      return r;
-    });
+    const updated = await window.itexStore.updateRoster(
+      (r) => {
+        const m = r.find((x) => x.id === id);
+        if (m) {
+          for (const { event_date, attendance_type } of days) m.schedule[event_date] = attendance_type;
+          m.updated_at = new Date().toISOString();
+        }
+        return r;
+      },
+      () => {
+        // Several people can be saving at once — retrying is normal, not broken.
+        if (btn) btn.textContent = isAr() ? 'الخادم مزدحم، جارٍ إعادة المحاولة...' : 'Busy, retrying...';
+      },
+    );
     roster = updated;
     member = roster.find((m) => m.id === id);
     saved = true;
   } catch {
     saved = false;
-    alert(isAr() ? 'تعذر الحفظ، حاول مرة أخرى.' : 'Save failed, please try again.');
+    alert(
+      isAr()
+        ? 'تعذر الحفظ بعد عدة محاولات (ازدحام مؤقت). اضغط "حفظ جدول الحضور" مرة أخرى.'
+        : 'Save failed after several attempts (temporary congestion). Press "Save attendance schedule" again.',
+    );
   }
   btn.disabled = false;
   render();

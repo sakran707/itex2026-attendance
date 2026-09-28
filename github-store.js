@@ -31,15 +31,20 @@ function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+// A 409 (someone else saved a split-second earlier) is cheap to recover from —
+// just re-read and re-apply — so it gets many fast retries with light jitter.
+// Everything else (dropped connections, GitHub briefly rate-limiting a burst
+// of near-simultaneous saves from many phones) gets fewer retries with a
+// growing backoff, since hammering it faster tends to make that worse.
+const MAX_CONFLICT_ATTEMPTS = 20;
+const MAX_OTHER_ATTEMPTS = 8;
+
 /**
  * Loads the latest roster, applies `mutate` to it, and commits the result.
- * Retries on a 409 (someone else saved in between, by re-reading the fresh
- * version and re-applying `mutate` on top of it) and on transient network
- * failures (common on mobile connections) with a short backoff, before
- * finally giving up.
+ * `onRetry(attempt)` is called before each retry so the caller can show
+ * progress instead of a silent stall.
  */
-async function updateRoster(mutate, attempt = 0) {
-  const MAX_ATTEMPTS = 6;
+async function updateRoster(mutate, onRetry, conflictAttempt = 0, otherAttempt = 0) {
   try {
     const { roster, sha } = await fetchRosterWithSha();
     const updated = mutate(roster);
@@ -58,15 +63,23 @@ async function updateRoster(mutate, attempt = 0) {
       }),
     });
     if (!res.ok) {
-      if (attempt >= MAX_ATTEMPTS - 1) throw new Error(`roster_save_failed:${res.status}`);
-      await sleep(400 * (attempt + 1));
-      return updateRoster(mutate, attempt + 1);
+      if (res.status === 409) {
+        if (conflictAttempt >= MAX_CONFLICT_ATTEMPTS - 1) throw new Error(`roster_save_failed:${res.status}`);
+        onRetry?.(conflictAttempt + otherAttempt + 1);
+        await sleep(150 + Math.random() * 250);
+        return updateRoster(mutate, onRetry, conflictAttempt + 1, otherAttempt);
+      }
+      if (otherAttempt >= MAX_OTHER_ATTEMPTS - 1) throw new Error(`roster_save_failed:${res.status}`);
+      onRetry?.(conflictAttempt + otherAttempt + 1);
+      await sleep(Math.min(600 * 2 ** otherAttempt, 4000));
+      return updateRoster(mutate, onRetry, conflictAttempt, otherAttempt + 1);
     }
     return updated;
   } catch (err) {
-    if (attempt >= MAX_ATTEMPTS - 1) throw err;
-    await sleep(400 * (attempt + 1));
-    return updateRoster(mutate, attempt + 1);
+    if (otherAttempt >= MAX_OTHER_ATTEMPTS - 1) throw err;
+    onRetry?.(conflictAttempt + otherAttempt + 1);
+    await sleep(Math.min(600 * 2 ** otherAttempt, 4000));
+    return updateRoster(mutate, onRetry, conflictAttempt, otherAttempt + 1);
   }
 }
 
