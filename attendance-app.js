@@ -33,7 +33,7 @@ let saved = false;
 
 async function load() {
   if (!token) return renderError();
-  const res = await fetch(`/api/attendance/${encodeURIComponent(token)}`);
+  const res = await fetch(`/api/attendance?token=${encodeURIComponent(token)}`);
   if (!res.ok) return renderError();
   personData = await res.json();
   schedule = { ...personData.schedule };
@@ -57,7 +57,7 @@ async function save() {
   btn.disabled = true;
   btn.textContent = isAr() ? '...جارٍ الحفظ' : 'Saving...';
   const days = EVENT_DATES.map((event_date) => ({ event_date, attendance_type: schedule[event_date] }));
-  const res = await fetch(`/api/attendance/${encodeURIComponent(token)}`, {
+  const res = await fetch(`/api/attendance?token=${encodeURIComponent(token)}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ days }),

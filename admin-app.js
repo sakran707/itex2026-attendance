@@ -28,7 +28,7 @@ let tab = 'roster';
 let data = null;
 
 async function checkSession() {
-  const res = await fetch('/api/admin/session');
+  const res = await fetch('/api/admin?action=session');
   const { isAdmin } = await res.json();
   if (isAdmin) {
     logoutBtn.style.display = 'inline-block';
@@ -49,7 +49,7 @@ function renderLogin(error) {
     </div>`;
   document.getElementById('loginBtn').addEventListener('click', async () => {
     const password = document.getElementById('pw').value;
-    const res = await fetch('/api/admin/login', {
+    const res = await fetch('/api/admin?action=login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ password }),
@@ -67,7 +67,7 @@ function renderLogin(error) {
 }
 
 async function loadData() {
-  const res = await fetch('/api/admin/members');
+  const res = await fetch('/api/admin?action=members');
   if (res.status === 401) return renderLogin();
   data = await res.json();
   render();
@@ -165,7 +165,7 @@ function render() {
 }
 
 logoutBtn.addEventListener('click', async () => {
-  await fetch('/api/admin/logout', { method: 'POST' });
+  await fetch('/api/admin?action=logout', { method: 'POST' });
   renderLogin();
 });
 
