@@ -11,7 +11,7 @@ const TYPE_OPTIONS = [
   { value: 'full_day', ar: 'يوم كامل', en: 'Full day', hint_ar: '10:00 ص – 8:00 م', hint_en: '10:00 AM – 8:00 PM' },
   { value: 'morning', ar: 'الشفت الصباحي', en: 'Morning shift', hint_ar: '10:00 ص – 3:00 م', hint_en: '10:00 AM – 3:00 PM' },
   { value: 'evening', ar: 'الشفت المسائي', en: 'Evening shift', hint_ar: '3:00 م – 8:00 م', hint_en: '3:00 PM – 8:00 PM' },
-  { value: 'unavailable', ar: 'غير متاح', en: 'Unavailable', hint_ar: '', hint_en: '' },
+  { value: 'unavailable', ar: 'غير متاح', en: 'Unavailable', hint_ar: '(لا أستطيع التواجد في هذا اليوم)', hint_en: "(I can't attend this day)" },
 ];
 
 const TYPE_SHORT = {
