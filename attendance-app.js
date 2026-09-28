@@ -86,6 +86,18 @@ function changePerson() {
   render();
 }
 
+function editAgain() {
+  saved = false;
+  render();
+}
+
+function backToStart() {
+  member = null;
+  saved = false;
+  searchTerm = '';
+  render();
+}
+
 function allChosen() {
   return EVENT_DATES.every((d) => !!schedule[d]);
 }
@@ -150,6 +162,39 @@ function renderPicker() {
   `;
 }
 
+function renderThankYou() {
+  const rows = EVENT_DATES.map((date) => {
+    const opt = TYPE_OPTIONS.find((o) => o.value === schedule[date]);
+    return `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;">
+      <span>${isAr() ? DAY_LABELS[date].ar : DAY_LABELS[date].en}</span>
+      <span style="font-weight:700;">${isAr() ? opt.ar : opt.en}</span>
+    </div>`;
+  }).join('');
+
+  return `
+    <div style="text-align:center;padding:40px 16px 20px;">
+      <div style="font-size:44px;line-height:1;margin-bottom:10px;">✅</div>
+      <h1 style="margin-bottom:6px;">${isAr() ? `شكرًا لك، ${member.full_name.split(' ')[0]}!` : `Thank you, ${member.full_name.split(' ')[0]}!`}</h1>
+      <p class="tagline" style="margin-bottom:2px;">${isAr() ? 'تم حفظ جدول حضورك بنجاح.' : 'Your attendance schedule has been saved.'}</p>
+      <p class="subtagline">${isAr() ? 'نشكرك على وقتك ودعمك للنقابة' : 'Thank you for your time and support'}</p>
+    </div>
+
+    <div class="card">
+      <p style="font-weight:700;font-size:13.5px;margin-bottom:8px;">${isAr() ? 'ملخص اختيارك' : 'Your schedule'}</p>
+      ${rows}
+    </div>
+
+    <div style="margin-top:16px;display:flex;flex-direction:column;gap:8px;">
+      <button type="button" id="editAgainBtn" style="background:none;border:1px solid var(--border);border-radius:8px;padding:11px;font-size:13px;font-weight:700;color:var(--ink);cursor:pointer;">
+        ${isAr() ? 'تعديل اختياري' : 'Edit my schedule'}
+      </button>
+      <button type="button" id="backToStartBtn" style="background:none;border:none;color:var(--ocean);font-size:12.5px;font-weight:700;cursor:pointer;padding:8px;">
+        ${isAr() ? 'إنهاء (لشخص آخر يستخدم هذا الجهاز)' : 'Done (for someone else using this device)'}
+      </button>
+    </div>
+  `;
+}
+
 function renderError() {
   app.innerHTML = `
     <div class="error-box">
@@ -177,6 +222,13 @@ function render() {
       const pos = searchInput.value.length;
       searchInput.setSelectionRange(pos, pos);
     }
+    return;
+  }
+
+  if (saved) {
+    app.innerHTML = renderThankYou();
+    document.getElementById('editAgainBtn')?.addEventListener('click', editAgain);
+    document.getElementById('backToStartBtn')?.addEventListener('click', backToStart);
     return;
   }
 
@@ -236,7 +288,6 @@ function render() {
       <button id="saveBtn" class="primary" ${!allChosen() ? 'disabled' : ''}>
         ${isAr() ? 'حفظ جدول الحضور' : 'Save attendance schedule'}
       </button>
-      ${saved ? `<p class="success">✓ ${isAr() ? 'تم حفظ جدول حضورك بنجاح.' : 'Your attendance schedule has been saved.'}</p>` : ''}
     </div>
   `;
 
