@@ -244,7 +244,10 @@ function render() {
           ${isAr() ? opt.ar : opt.en}${hint ? `<small>${hint}</small>` : ''}
         </button>${
           names.length
-            ? `<p style="font-size:10.5px;color:#778;margin:3px 2px 0;line-height:1.3;">${isAr() ? 'موجود أيضاً: ' : 'Also there: '}${names.join('، ')}</p>`
+            ? `<div style="font-size:10.5px;color:#778;margin:4px 2px 0;">
+                <span style="font-weight:600;">${isAr() ? 'موجود أيضاً:' : 'Also there:'}</span>
+                ${names.map((n) => `<div style="margin-top:2px;">${n}</div>`).join('')}
+              </div>`
             : ''
         }
       </div>`;
