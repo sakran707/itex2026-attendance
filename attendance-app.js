@@ -8,10 +8,10 @@ const DAY_LABELS = {
 };
 
 const TYPE_OPTIONS = [
-  { value: 'full_day', ar: 'يوم كامل', en: 'Full day', hint: '10:00 – 20:00' },
-  { value: 'morning', ar: 'الشفت الصباحي', en: 'Morning shift', hint: '10:00 – 15:00' },
-  { value: 'evening', ar: 'الشفت المسائي', en: 'Evening shift', hint: '15:00 – 20:00' },
-  { value: 'unavailable', ar: 'غير متاح', en: 'Unavailable', hint: '' },
+  { value: 'full_day', ar: 'يوم كامل', en: 'Full day', hint_ar: '10:00 ص – 8:00 م', hint_en: '10:00 AM – 8:00 PM' },
+  { value: 'morning', ar: 'الشفت الصباحي', en: 'Morning shift', hint_ar: '10:00 ص – 3:00 م', hint_en: '10:00 AM – 3:00 PM' },
+  { value: 'evening', ar: 'الشفت المسائي', en: 'Evening shift', hint_ar: '3:00 م – 8:00 م', hint_en: '3:00 PM – 8:00 PM' },
+  { value: 'unavailable', ar: 'غير متاح', en: 'Unavailable', hint_ar: '', hint_en: '' },
 ];
 
 const TYPE_SHORT = {
@@ -183,8 +183,9 @@ function render() {
   const dayCards = EVENT_DATES.map((date) => {
     const opts = TYPE_OPTIONS.map((opt) => {
       const active = schedule[date] === opt.value;
+      const hint = isAr() ? opt.hint_ar : opt.hint_en;
       return `<button type="button" class="opt${active ? ' active' : ''}" data-date="${date}" data-type="${opt.value}">
-        ${isAr() ? opt.ar : opt.en}${opt.hint ? `<small>${opt.hint}</small>` : ''}
+        ${isAr() ? opt.ar : opt.en}${hint ? `<small>${hint}</small>` : ''}
       </button>`;
     }).join('');
 

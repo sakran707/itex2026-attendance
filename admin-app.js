@@ -23,9 +23,9 @@ const CATEGORY_LABELS = {
 const CATEGORY_ORDER = ['leadership', 'council', 'fund_committee', 'other'];
 
 const TYPE_OPTIONS = [
-  { value: 'full_day', label: 'يوم كامل', hint: '10:00 – 20:00' },
-  { value: 'morning', label: 'صباحي', hint: '10:00 – 15:00' },
-  { value: 'evening', label: 'مسائي', hint: '15:00 – 20:00' },
+  { value: 'full_day', label: 'يوم كامل', hint: '10:00 ص – 8:00 م' },
+  { value: 'morning', label: 'صباحي', hint: '10:00 ص – 3:00 م' },
+  { value: 'evening', label: 'مسائي', hint: '3:00 م – 8:00 م' },
   { value: 'unavailable', label: 'غير متاح', hint: '' },
 ];
 
