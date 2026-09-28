@@ -2,7 +2,7 @@ require('dotenv').config();
 const path = require('path');
 const express = require('express');
 const cookieSession = require('cookie-session');
-const db = require('./db');
+const { pool, init } = require('./db');
 const rules = require('./attendanceRules');
 
 const app = express();
@@ -26,33 +26,45 @@ function requireAdmin(req, res, next) {
   return res.status(401).json({ message: 'unauthorized' });
 }
 
+// Wrap async route handlers so a rejected promise reaches Express's error handler
+// instead of crashing the process.
+const wrap = (fn) => (req, res, next) => fn(req, res, next).catch(next);
+
 /* ---------------------------------------------------------------------- */
 /* Public: one private link per roster member, no login required          */
 /* ---------------------------------------------------------------------- */
 
-app.get('/api/attendance/:token', (req, res) => {
-  const member = db.prepare('SELECT * FROM members WHERE access_token = ?').get(req.params.token);
-  if (!member) return res.status(404).json({ message: 'not_found' });
+app.get(
+  '/api/attendance/:token',
+  wrap(async (req, res) => {
+    const { rows } = await pool.query('SELECT * FROM members WHERE access_token = $1', [req.params.token]);
+    const member = rows[0];
+    if (!member) return res.status(404).json({ message: 'not_found' });
 
-  res.json({
-    full_name: member.full_name,
-    position_title: member.position_title,
-    schedule: rules.scheduleFor(db, member.id),
-  });
-});
+    res.json({
+      full_name: member.full_name,
+      position_title: member.position_title,
+      schedule: await rules.scheduleFor(pool, member.id),
+    });
+  }),
+);
 
-app.put('/api/attendance/:token', (req, res) => {
-  const member = db.prepare('SELECT * FROM members WHERE access_token = ?').get(req.params.token);
-  if (!member) return res.status(404).json({ message: 'not_found' });
+app.put(
+  '/api/attendance/:token',
+  wrap(async (req, res) => {
+    const { rows } = await pool.query('SELECT * FROM members WHERE access_token = $1', [req.params.token]);
+    const member = rows[0];
+    if (!member) return res.status(404).json({ message: 'not_found' });
 
-  const days = req.body?.days;
-  if (!Array.isArray(days) || days.length === 0 || !days.every(rules.isValidDay)) {
-    return res.status(422).json({ message: 'invalid_days' });
-  }
+    const days = req.body?.days;
+    if (!Array.isArray(days) || days.length === 0 || !days.every(rules.isValidDay)) {
+      return res.status(422).json({ message: 'invalid_days' });
+    }
 
-  rules.setDays(db, member.id, days);
-  res.json({ message: 'saved', schedule: rules.scheduleFor(db, member.id) });
-});
+    await rules.setDays(pool, member.id, days);
+    res.json({ message: 'saved', schedule: await rules.scheduleFor(pool, member.id) });
+  }),
+);
 
 /* ---------------------------------------------------------------------- */
 /* Admin: single shared password, session cookie — no per-user accounts   */
@@ -75,46 +87,70 @@ app.get('/api/admin/session', (req, res) => {
   res.json({ isAdmin: !!req.session?.isAdmin });
 });
 
-app.get('/api/admin/members', requireAdmin, (req, res) => {
-  const members = db.prepare('SELECT * FROM members ORDER BY sort_order').all();
+app.get(
+  '/api/admin/members',
+  requireAdmin,
+  wrap(async (req, res) => {
+    const { rows: members } = await pool.query('SELECT * FROM members ORDER BY sort_order');
 
-  const roster = members.map((m) => ({
-    id: m.id,
-    full_name: m.full_name,
-    position_title: m.position_title,
-    category: m.category,
-    access_token: m.access_token,
-    schedule: rules.scheduleFor(db, m.id),
-    updated_at: rules.lastUpdated(db, m.id),
-  }));
+    const roster = await Promise.all(
+      members.map(async (m) => ({
+        id: m.id,
+        full_name: m.full_name,
+        position_title: m.position_title,
+        category: m.category,
+        access_token: m.access_token,
+        schedule: await rules.scheduleFor(pool, m.id),
+        updated_at: await rules.lastUpdated(pool, m.id),
+      })),
+    );
 
-  const summary = {};
-  for (const date of rules.EVENT_DATES) {
-    const byType = { full_day: [], morning: [], evening: [], unavailable: [] };
-    for (const person of roster) {
-      const type = person.schedule[date];
-      if (type) byType[type].push(person.full_name);
+    const summary = {};
+    for (const date of rules.EVENT_DATES) {
+      const byType = { full_day: [], morning: [], evening: [], unavailable: [] };
+      for (const person of roster) {
+        const type = person.schedule[date];
+        if (type) byType[type].push(person.full_name);
+      }
+      summary[date] = byType;
     }
-    summary[date] = byType;
-  }
 
-  res.json({ members: roster, summary });
-});
+    res.json({ members: roster, summary });
+  }),
+);
 
-app.put('/api/admin/members/:id', requireAdmin, (req, res) => {
-  const member = db.prepare('SELECT * FROM members WHERE id = ?').get(req.params.id);
-  if (!member) return res.status(404).json({ message: 'not_found' });
+app.put(
+  '/api/admin/members/:id',
+  requireAdmin,
+  wrap(async (req, res) => {
+    const { rows } = await pool.query('SELECT * FROM members WHERE id = $1', [req.params.id]);
+    const member = rows[0];
+    if (!member) return res.status(404).json({ message: 'not_found' });
 
-  const days = req.body?.days;
-  if (!Array.isArray(days) || days.length === 0 || !days.every(rules.isValidDay)) {
-    return res.status(422).json({ message: 'invalid_days' });
-  }
+    const days = req.body?.days;
+    if (!Array.isArray(days) || days.length === 0 || !days.every(rules.isValidDay)) {
+      return res.status(422).json({ message: 'invalid_days' });
+    }
 
-  rules.setDays(db, member.id, days);
-  res.json({ message: 'saved', schedule: rules.scheduleFor(db, member.id) });
+    await rules.setDays(pool, member.id, days);
+    res.json({ message: 'saved', schedule: await rules.scheduleFor(pool, member.id) });
+  }),
+);
+
+app.use((err, req, res, next) => {
+  console.error(err);
+  res.status(500).json({ message: 'server_error' });
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`ITEX 2026 attendance app listening on port ${PORT}`));
+
+init()
+  .then(() => {
+    app.listen(PORT, () => console.log(`ITEX 2026 attendance app listening on port ${PORT}`));
+  })
+  .catch((err) => {
+    console.error('Failed to initialize database', err);
+    process.exit(1);
+  });
 
 module.exports = app;

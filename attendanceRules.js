@@ -23,51 +23,55 @@ function isValidDay(day) {
 }
 
 /** Upsert one day's attendance choice for a member; time range is derived, never taken from the client. */
-function setDay(db, memberId, eventDate, attendanceType) {
+async function setDay(pool, memberId, eventDate, attendanceType) {
   const [start, end] = TIME_RANGES[attendanceType];
-  db.prepare(
+  await pool.query(
     `INSERT INTO attendances (member_id, event_date, attendance_type, start_time, end_time, updated_at)
-     VALUES (@memberId, @eventDate, @attendanceType, @start, @end, @now)
-     ON CONFLICT(member_id, event_date) DO UPDATE SET
+     VALUES ($1, $2, $3, $4, $5, now())
+     ON CONFLICT (member_id, event_date) DO UPDATE SET
        attendance_type = excluded.attendance_type,
        start_time = excluded.start_time,
        end_time = excluded.end_time,
        updated_at = excluded.updated_at`,
-  ).run({
-    memberId,
-    eventDate,
-    attendanceType,
-    start,
-    end,
-    now: new Date().toISOString(),
-  });
+    [memberId, eventDate, attendanceType, start, end],
+  );
 }
 
-function setDays(db, memberId, days) {
-  const tx = db.transaction((rows) => {
-    for (const { event_date, attendance_type } of rows) {
-      setDay(db, memberId, event_date, attendance_type);
+async function setDays(pool, memberId, days) {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    for (const { event_date, attendance_type } of days) {
+      await setDay(client, memberId, event_date, attendance_type);
     }
-  });
-  tx(days);
+    await client.query('COMMIT');
+  } catch (err) {
+    await client.query('ROLLBACK');
+    throw err;
+  } finally {
+    client.release();
+  }
 }
 
 /** @returns {{[date: string]: string|null}} every fixed date mapped to its chosen type (or null) */
-function scheduleFor(db, memberId) {
-  const rows = db
-    .prepare('SELECT event_date, attendance_type FROM attendances WHERE member_id = ?')
-    .all(memberId);
+async function scheduleFor(pool, memberId) {
+  const { rows } = await pool.query(
+    `SELECT to_char(event_date, 'YYYY-MM-DD') AS event_date, attendance_type
+     FROM attendances WHERE member_id = $1`,
+    [memberId],
+  );
   const byDate = Object.fromEntries(rows.map((r) => [r.event_date, r.attendance_type]));
   const schedule = {};
   for (const date of EVENT_DATES) schedule[date] = byDate[date] ?? null;
   return schedule;
 }
 
-function lastUpdated(db, memberId) {
-  const row = db
-    .prepare('SELECT MAX(updated_at) AS updated_at FROM attendances WHERE member_id = ?')
-    .get(memberId);
-  return row?.updated_at ?? null;
+async function lastUpdated(pool, memberId) {
+  const { rows } = await pool.query(
+    'SELECT MAX(updated_at) AS updated_at FROM attendances WHERE member_id = $1',
+    [memberId],
+  );
+  return rows[0]?.updated_at ?? null;
 }
 
 module.exports = { EVENT_DATES, TIME_RANGES, ATTENDANCE_TYPES, isValidDay, setDays, scheduleFor, lastUpdated };
