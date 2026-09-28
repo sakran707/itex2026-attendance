@@ -233,33 +233,26 @@ function render() {
   }
 
   const dayCards = EVENT_DATES.map((date) => {
+    const daySummary = buildDaySummary(roster, date);
+
     const opts = TYPE_OPTIONS.map((opt) => {
       const active = schedule[date] === opt.value;
       const hint = isAr() ? opt.hint_ar : opt.hint_en;
-      return `<button type="button" class="opt${active ? ' active' : ''}" data-date="${date}" data-type="${opt.value}">
-        ${isAr() ? opt.ar : opt.en}${hint ? `<small>${hint}</small>` : ''}
-      </button>`;
+      const names = opt.value === 'unavailable' ? [] : daySummary[opt.value].filter((n) => n !== member.full_name);
+      return `<div>
+        <button type="button" class="opt${active ? ' active' : ''}" data-date="${date}" data-type="${opt.value}" style="width:100%;">
+          ${isAr() ? opt.ar : opt.en}${hint ? `<small>${hint}</small>` : ''}
+        </button>${
+          names.length
+            ? `<p style="font-size:10.5px;color:#778;margin:3px 2px 0;line-height:1.3;">${isAr() ? 'موجود أيضاً: ' : 'Also there: '}${names.join('، ')}</p>`
+            : ''
+        }
+      </div>`;
     }).join('');
-
-    const daySummary = buildDaySummary(roster, date);
-    const counts = ['full_day', 'morning', 'evening', 'unavailable']
-      .map((t) => `${isAr() ? TYPE_SHORT[t].ar : TYPE_SHORT[t].en}: <b class="num">${daySummary[t].length}</b>`)
-      .join(' · ');
-    const namesByType = ['full_day', 'morning', 'evening', 'unavailable']
-      .map((t) =>
-        daySummary[t].length
-          ? `<div style="margin-top:6px;"><b>${isAr() ? TYPE_SHORT[t].ar : TYPE_SHORT[t].en}:</b> ${daySummary[t].join('، ')}</div>`
-          : '',
-      )
-      .join('');
 
     return `<div class="card">
       <p class="day-title">${isAr() ? DAY_LABELS[date].ar : DAY_LABELS[date].en}</p>
       <div class="options">${opts}</div>
-      <details style="margin-top:10px;">
-        <summary style="cursor:pointer;font-size:12px;color:var(--ocean);font-weight:700;">${counts}</summary>
-        <div style="font-size:12px;color:#556;margin-top:4px;">${namesByType || `<span style="color:#ccd;">${isAr() ? 'لا أحد بعد' : 'No one yet'}</span>`}</div>
-      </details>
     </div>`;
   }).join('');
 
