@@ -22,6 +22,22 @@ const CATEGORY_LABELS = {
 };
 const CATEGORY_ORDER = ['leadership', 'council', 'fund_committee', 'other'];
 
+const TYPE_SHORT = {
+  full_day: { ar: 'كامل', en: 'Full' },
+  morning: { ar: 'صباحي', en: 'AM' },
+  evening: { ar: 'مسائي', en: 'PM' },
+  unavailable: { ar: 'غير متاح', en: 'N/A' },
+};
+
+function buildDaySummary(roster, date) {
+  const byType = { full_day: [], morning: [], evening: [], unavailable: [] };
+  for (const person of roster) {
+    const type = person.schedule[date];
+    if (type) byType[type].push(person.full_name);
+  }
+  return byType;
+}
+
 let lang = localStorage.getItem('itex_lang') || 'ar';
 const isAr = () => lang === 'ar';
 
@@ -153,9 +169,26 @@ function render() {
         ${isAr() ? opt.ar : opt.en}${opt.hint ? `<small>${opt.hint}</small>` : ''}
       </button>`;
     }).join('');
+
+    const daySummary = buildDaySummary(roster, date);
+    const counts = ['full_day', 'morning', 'evening', 'unavailable']
+      .map((t) => `${isAr() ? TYPE_SHORT[t].ar : TYPE_SHORT[t].en}: <b class="num">${daySummary[t].length}</b>`)
+      .join(' · ');
+    const namesByType = ['full_day', 'morning', 'evening', 'unavailable']
+      .map((t) =>
+        daySummary[t].length
+          ? `<div style="margin-top:6px;"><b>${isAr() ? TYPE_SHORT[t].ar : TYPE_SHORT[t].en}:</b> ${daySummary[t].join('، ')}</div>`
+          : '',
+      )
+      .join('');
+
     return `<div class="card">
       <p class="day-title">${isAr() ? DAY_LABELS[date].ar : DAY_LABELS[date].en}</p>
       <div class="options">${opts}</div>
+      <details style="margin-top:10px;">
+        <summary style="cursor:pointer;font-size:12px;color:var(--ocean);font-weight:700;">${counts}</summary>
+        <div style="font-size:12px;color:#556;margin-top:4px;">${namesByType || `<span style="color:#ccd;">${isAr() ? 'لا أحد بعد' : 'No one yet'}</span>`}</div>
+      </details>
     </div>`;
   }).join('');
 
