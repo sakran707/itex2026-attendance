@@ -14,14 +14,6 @@ const TYPE_OPTIONS = [
   { value: 'unavailable', ar: 'غير متاح', en: 'Unavailable', hint: '' },
 ];
 
-const CATEGORY_LABELS = {
-  leadership: { ar: 'نقيب ونائب النقيب', en: 'President & Vice President' },
-  council: { ar: 'أعضاء مجلس النقابة', en: 'Syndicate Council Members' },
-  fund_committee: { ar: 'لجنة صندوق النقابة', en: 'Fund Committee' },
-  other: { ar: 'مناصب أخرى', en: 'Other Positions' },
-};
-const CATEGORY_ORDER = ['leadership', 'council', 'fund_committee', 'other'];
-
 const TYPE_SHORT = {
   full_day: { ar: 'كامل', en: 'Full' },
   morning: { ar: 'صباحي', en: 'AM' },
@@ -126,12 +118,22 @@ async function save() {
 
 function renderPicker() {
   const term = searchTerm.trim();
-  const filtered = term ? roster.filter((m) => m.full_name.includes(term)) : roster;
+  const matches = term ? roster.filter((m) => m.full_name.includes(term)) : [];
 
-  const groups = CATEGORY_ORDER.map((cat) => ({
-    cat,
-    members: filtered.filter((m) => m.category === cat).sort((a, b) => a.sort_order - b.sort_order),
-  })).filter((g) => g.members.length);
+  const resultsHtml = !term
+    ? ''
+    : matches.length
+      ? `<div class="card" style="padding:6px;">
+          ${matches
+            .map(
+              (m) => `
+            <button type="button" class="person-pick" data-id="${m.id}" style="display:block;width:100%;text-align:${isAr() ? 'right' : 'left'};background:none;border:none;border-bottom:1px solid var(--border);padding:12px 10px;font-size:13.5px;font-weight:600;color:var(--ink);cursor:pointer;">
+              ${m.full_name}${m.position_title ? `<br><span style="font-weight:500;font-size:12px;color:#889;">${m.position_title}</span>` : ''}
+            </button>`,
+            )
+            .join('')}
+        </div>`
+      : `<p style="text-align:center;color:#889;font-size:13px;">${isAr() ? 'لا يوجد اسم مطابق' : 'No matching name'}</p>`;
 
   return `
     <div style="text-align:center;margin-bottom:18px;">
@@ -140,28 +142,11 @@ function renderPicker() {
       <p class="subtagline">${isAr() ? 'بوث نقابة المبرمجين العراقيين' : 'Iraqi Programmers Syndicate booth'}</p>
     </div>
     <div class="card" style="margin-bottom:18px;">
-      <p style="font-weight:700;font-size:14px;margin:0 0 8px;">${isAr() ? 'اختر اسمك' : 'Select your name'}</p>
+      <p style="font-weight:700;font-size:14px;margin:0 0 8px;">${isAr() ? 'اكتب اسمك للبحث' : 'Type your name to search'}</p>
       <input id="nameSearch" type="text" value="${term.replace(/"/g, '&quot;')}" placeholder="${isAr() ? 'اكتب اسمك...' : 'Type your name...'}"
         style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;" />
     </div>
-    ${groups.length
-      ? groups
-          .map(
-            (g) => `
-      <p class="group-title">${isAr() ? CATEGORY_LABELS[g.cat].ar : CATEGORY_LABELS[g.cat].en}</p>
-      <div class="card" style="padding:6px;">
-        ${g.members
-          .map(
-            (m) => `
-          <button type="button" class="person-pick" data-id="${m.id}" style="display:block;width:100%;text-align:${isAr() ? 'right' : 'left'};background:none;border:none;border-bottom:1px solid var(--border);padding:12px 10px;font-size:13.5px;font-weight:600;color:var(--ink);cursor:pointer;">
-            ${m.full_name}${m.position_title ? `<br><span style="font-weight:500;font-size:12px;color:#889;">${m.position_title}</span>` : ''}
-          </button>`,
-          )
-          .join('')}
-      </div>`,
-          )
-          .join('')
-      : `<p style="text-align:center;color:#889;font-size:13px;">${isAr() ? 'لا يوجد اسم مطابق' : 'No matching name'}</p>`}
+    ${resultsHtml}
   `;
 }
 
