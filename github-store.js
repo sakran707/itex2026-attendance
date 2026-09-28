@@ -27,33 +27,47 @@ async function fetchRosterWithSha() {
   return { roster: JSON.parse(decodeBase64Utf8(data.content)), sha: data.sha };
 }
 
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 /**
  * Loads the latest roster, applies `mutate` to it, and commits the result.
- * Retries a few times on a 409 (someone else saved in between) by re-reading
- * the fresh version and re-applying `mutate` on top of it.
+ * Retries on a 409 (someone else saved in between, by re-reading the fresh
+ * version and re-applying `mutate` on top of it) and on transient network
+ * failures (common on mobile connections) with a short backoff, before
+ * finally giving up.
  */
 async function updateRoster(mutate, attempt = 0) {
-  const { roster, sha } = await fetchRosterWithSha();
-  const updated = mutate(roster);
-  const res = await fetch(API_BASE, {
-    method: 'PUT',
-    headers: {
-      Authorization: `Bearer ${GITHUB_TOKEN}`,
-      Accept: 'application/vnd.github+json',
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      message: 'Update ITEX 2026 attendance',
-      content: encodeUtf8Base64(JSON.stringify(updated, null, 2) + '\n'),
-      sha,
-      branch: GITHUB_BRANCH,
-    }),
-  });
-  if (res.status === 409 && attempt < 4) {
+  const MAX_ATTEMPTS = 6;
+  try {
+    const { roster, sha } = await fetchRosterWithSha();
+    const updated = mutate(roster);
+    const res = await fetch(API_BASE, {
+      method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${GITHUB_TOKEN}`,
+        Accept: 'application/vnd.github+json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        message: 'Update ITEX 2026 attendance',
+        content: encodeUtf8Base64(JSON.stringify(updated, null, 2) + '\n'),
+        sha,
+        branch: GITHUB_BRANCH,
+      }),
+    });
+    if (!res.ok) {
+      if (attempt >= MAX_ATTEMPTS - 1) throw new Error(`roster_save_failed:${res.status}`);
+      await sleep(400 * (attempt + 1));
+      return updateRoster(mutate, attempt + 1);
+    }
+    return updated;
+  } catch (err) {
+    if (attempt >= MAX_ATTEMPTS - 1) throw err;
+    await sleep(400 * (attempt + 1));
     return updateRoster(mutate, attempt + 1);
   }
-  if (!res.ok) throw new Error(`roster_save_failed:${res.status}`);
-  return updated;
 }
 
 window.itexStore = { fetchRosterWithSha, updateRoster };
