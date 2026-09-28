@@ -270,12 +270,12 @@ function render() {
       const active = schedule[date] === opt.value;
       const hint = isAr() ? opt.hint_ar : opt.hint_en;
       const names = opt.value === 'unavailable' ? [] : daySummary[opt.value].filter((n) => n !== member.full_name);
-      return `<div>
-        <button type="button" class="opt${active ? ' active' : ''}" data-date="${date}" data-type="${opt.value}" style="width:100%;">
+      return `<div style="border:1px solid ${active ? 'var(--accent)' : 'var(--border)'};border-radius:10px;overflow:hidden;${active ? 'background:rgba(255,110,66,.1);' : ''}">
+        <button type="button" class="opt${active ? ' active' : ''}" data-date="${date}" data-type="${opt.value}" style="width:100%;border:none;border-radius:0;background:transparent;">
           ${isAr() ? opt.ar : opt.en}${hint ? `<small>${hint}</small>` : ''}
         </button>${
           names.length
-            ? `<div style="font-size:10.5px;color:#778;margin:4px 2px 0;">
+            ? `<div style="font-size:10.5px;color:#778;padding:6px 8px;border-top:1px solid ${active ? 'rgba(255,110,66,.25)' : 'var(--border)'};">
                 <span style="font-weight:600;">${isAr() ? 'موجود أيضاً:' : 'Also there:'}</span>
                 ${names.map((n) => `<div style="margin-top:2px;">${n}</div>`).join('')}
               </div>`
