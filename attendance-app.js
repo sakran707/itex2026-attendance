@@ -8,9 +8,9 @@ const DAY_LABELS = {
 };
 
 const TYPE_OPTIONS = [
-  { value: 'full_day', ar: 'يوم كامل', en: 'Full day', hint_ar: '10:00 ص – 8:00 م', hint_en: '10:00 AM – 8:00 PM' },
-  { value: 'morning', ar: 'الشفت الصباحي', en: 'Morning shift', hint_ar: '10:00 ص – 3:00 م', hint_en: '10:00 AM – 3:00 PM' },
-  { value: 'evening', ar: 'الشفت المسائي', en: 'Evening shift', hint_ar: '3:00 م – 8:00 م', hint_en: '3:00 PM – 8:00 PM' },
+  { value: 'full_day', ar: 'يوم كامل', en: 'Full day', hint_ar: '10:00 ص – 6:00 م', hint_en: '10:00 AM – 6:00 PM' },
+  { value: 'morning', ar: 'الشفت الصباحي', en: 'Morning shift', hint_ar: '10:00 ص – 2:00 م', hint_en: '10:00 AM – 2:00 PM' },
+  { value: 'evening', ar: 'الشفت المسائي', en: 'Evening shift', hint_ar: '2:00 م – 6:00 م', hint_en: '2:00 PM – 6:00 PM' },
   { value: 'unavailable', ar: 'غير متاح', en: 'Unavailable', hint_ar: '(لا أستطيع التواجد في هذا اليوم)', hint_en: "(I can't attend this day)" },
 ];
 
@@ -305,7 +305,7 @@ function render() {
         </div>
         <button type="button" id="changePersonBtn" style="background:none;border:none;color:var(--ocean);font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;">${isAr() ? 'لست أنا' : 'Not me'}</button>
       </div>
-      <p class="hours-note">${isAr() ? 'وقت المعرض: 10:00 صباحاً – 8:00 مساءً' : 'Fair hours: 10:00 AM – 8:00 PM'}</p>
+      <p class="hours-note">${isAr() ? 'وقت المعرض: 10:00 صباحاً – 6:00 مساءً' : 'Fair hours: 10:00 AM – 6:00 PM'}</p>
     </div>
 
     ${dayCards}
