@@ -157,12 +157,12 @@
     "sort_order": 11,
     "access_token": "7f90ee8d3450c73d8f2e9ee65931017b007aba4d",
     "schedule": {
-      "2026-09-30": null,
-      "2026-10-01": null,
-      "2026-10-02": null,
-      "2026-10-03": null
+      "2026-09-30": "full_day",
+      "2026-10-01": "unavailable",
+      "2026-10-02": "evening",
+      "2026-10-03": "full_day"
     },
-    "updated_at": null
+    "updated_at": "2026-09-28T12:51:21.410Z"
   },
   {
     "id": 12,
