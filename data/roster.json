@@ -232,12 +232,12 @@
     "sort_order": 16,
     "access_token": "6a956d212b046b8a7dc8f15bffffa6e65c61ef79",
     "schedule": {
-      "2026-09-30": "full_day",
+      "2026-09-30": "unavailable",
       "2026-10-01": "unavailable",
       "2026-10-02": "unavailable",
       "2026-10-03": "unavailable"
     },
-    "updated_at": "2026-09-28T12:32:44.549Z"
+    "updated_at": "2026-09-28T12:39:11.754Z"
   },
   {
     "id": 17,
