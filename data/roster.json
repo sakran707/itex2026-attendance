@@ -172,12 +172,12 @@
     "sort_order": 12,
     "access_token": "fb926f430e72d0b75140ac5e93f0183a6eb3d215",
     "schedule": {
-      "2026-09-30": null,
-      "2026-10-01": null,
-      "2026-10-02": null,
-      "2026-10-03": null
+      "2026-09-30": "morning",
+      "2026-10-01": "unavailable",
+      "2026-10-02": "unavailable",
+      "2026-10-03": "evening"
     },
-    "updated_at": null
+    "updated_at": "2026-09-28T14:00:46.997Z"
   },
   {
     "id": 13,
