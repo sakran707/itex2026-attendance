@@ -175,7 +175,7 @@ function renderPicker() {
     <div class="card" style="margin-bottom:18px;">
       <p style="font-weight:700;font-size:14px;margin:0 0 8px;">${isAr() ? 'اكتب اسمك للبحث' : 'Type your name to search'}</p>
       <input id="nameSearch" type="text" value="${term.replace(/"/g, '&quot;')}" placeholder="${isAr() ? 'اكتب اسمك...' : 'Type your name...'}"
-        style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;" />
+        style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:16px;" />
     </div>
     ${resultsHtml}
   `;

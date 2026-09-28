@@ -179,7 +179,8 @@ th { background: #f3f5f6; font-size: 11px; text-transform: uppercase; color: #77
   padding: 10px 12px;
   border: 1px solid var(--border);
   border-radius: 8px;
-  font-size: 14px;
+  /* 16px minimum — smaller triggers iOS/Android's auto-zoom-on-focus */
+  font-size: 16px;
   margin-bottom: 10px;
 }
 .login-error { color: #c0392b; font-size: 12.5px; margin-bottom: 8px; }
