@@ -31,12 +31,19 @@ let schedule = {};
 let personData = null;
 let saved = false;
 
+let member = null;
+
 async function load() {
   if (!token) return renderError();
-  const res = await fetch(`/api/attendance?token=${encodeURIComponent(token)}`);
-  if (!res.ok) return renderError();
-  personData = await res.json();
-  schedule = { ...personData.schedule };
+  try {
+    const { roster } = await window.itexStore.fetchRosterWithSha();
+    member = roster.find((m) => m.access_token === token);
+  } catch {
+    member = null;
+  }
+  if (!member) return renderError();
+  personData = { full_name: member.full_name, position_title: member.position_title };
+  schedule = { ...member.schedule };
   render();
 }
 
@@ -57,15 +64,21 @@ async function save() {
   btn.disabled = true;
   btn.textContent = isAr() ? '...جارٍ الحفظ' : 'Saving...';
   const days = EVENT_DATES.map((event_date) => ({ event_date, attendance_type: schedule[event_date] }));
-  const res = await fetch(`/api/attendance?token=${encodeURIComponent(token)}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ days }),
-  });
-  btn.disabled = false;
-  if (res.ok) {
+  try {
+    await window.itexStore.updateRoster((roster) => {
+      const m = roster.find((r) => r.access_token === token);
+      if (m) {
+        for (const { event_date, attendance_type } of days) m.schedule[event_date] = attendance_type;
+        m.updated_at = new Date().toISOString();
+      }
+      return roster;
+    });
     saved = true;
+  } catch {
+    saved = false;
+    alert(isAr() ? 'تعذر الحفظ، حاول مرة أخرى.' : 'Save failed, please try again.');
   }
+  btn.disabled = false;
   render();
 }
 

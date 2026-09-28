@@ -1,0 +1,347 @@
+[
+  {
+    "id": 1,
+    "full_name": "أثير حامد عبد الأمير مجيد",
+    "position_title": "نقيب المبرمجين العراقيين",
+    "category": "leadership",
+    "sort_order": 1,
+    "access_token": "f47733dd8b53613a13e7a7596bb43f299046f557",
+    "schedule": {
+      "2026-09-30": null,
+      "2026-10-01": null,
+      "2026-10-02": null,
+      "2026-10-03": null
+    },
+    "updated_at": null
+  },
+  {
+    "id": 2,
+    "full_name": "مازن سمير علي محسن الحكيم",
+    "position_title": "نائب نقيب نقابة المبرمجين العراقيين",
+    "category": "leadership",
+    "sort_order": 2,
+    "access_token": "2a7135ff81ebc9f588770e4d9f7b1cad523521a9",
+    "schedule": {
+      "2026-09-30": null,
+      "2026-10-01": null,
+      "2026-10-02": null,
+      "2026-10-03": null
+    },
+    "updated_at": null
+  },
+  {
+    "id": 3,
+    "full_name": "محمد فاضل مهدي عباس",
+    "position_title": null,
+    "category": "council",
+    "sort_order": 3,
+    "access_token": "8bab4bf7cc3ea0026031ac1ee1271b047d3ccf66",
+    "schedule": {
+      "2026-09-30": null,
+      "2026-10-01": null,
+      "2026-10-02": null,
+      "2026-10-03": null
+    },
+    "updated_at": null
+  },
+  {
+    "id": 4,
+    "full_name": "ظافر حميد عبد جاسم",
+    "position_title": null,
+    "category": "council",
+    "sort_order": 4,
+    "access_token": "121e372c756d3e99c8e5bec16678c8cd4cf0f2c7",
+    "schedule": {
+      "2026-09-30": null,
+      "2026-10-01": null,
+      "2026-10-02": null,
+      "2026-10-03": null
+    },
+    "updated_at": null
+  },
+  {
+    "id": 5,
+    "full_name": "هديل محسن إبراهيم",
+    "position_title": null,
+    "category": "council",
+    "sort_order": 5,
+    "access_token": "da0e3c7f1853dea0ae4f89585b88a11d79055564",
+    "schedule": {
+      "2026-09-30": null,
+      "2026-10-01": null,
+      "2026-10-02": null,
+      "2026-10-03": null
+    },
+    "updated_at": null
+  },
+  {
+    "id": 6,
+    "full_name": "ايهم عقيل محمد رضا",
+    "position_title": null,
+    "category": "council",
+    "sort_order": 6,
+    "access_token": "a04d9884d02f3e90e1f39c5ddce0100ff919d239",
+    "schedule": {
+      "2026-09-30": null,
+      "2026-10-01": null,
+      "2026-10-02": null,
+      "2026-10-03": null
+    },
+    "updated_at": null
+  },
+  {
+    "id": 7,
+    "full_name": "حيدر مجيد ناجي",
+    "position_title": null,
+    "category": "council",
+    "sort_order": 7,
+    "access_token": "0bdab44da2c14413c5fb87225cb8b0d0ef318459",
+    "schedule": {
+      "2026-09-30": null,
+      "2026-10-01": null,
+      "2026-10-02": null,
+      "2026-10-03": null
+    },
+    "updated_at": null
+  },
+  {
+    "id": 8,
+    "full_name": "ايهاب عنان مهيدي سعيد",
+    "position_title": null,
+    "category": "council",
+    "sort_order": 8,
+    "access_token": "dd93fa53e19b690f00371d81d927296962454d46",
+    "schedule": {
+      "2026-09-30": null,
+      "2026-10-01": null,
+      "2026-10-02": null,
+      "2026-10-03": null
+    },
+    "updated_at": null
+  },
+  {
+    "id": 9,
+    "full_name": "سمير عيسى مانع",
+    "position_title": null,
+    "category": "council",
+    "sort_order": 9,
+    "access_token": "52f2aed8e7cb2ce052683e4820d01a42eb43170a",
+    "schedule": {
+      "2026-09-30": null,
+      "2026-10-01": null,
+      "2026-10-02": null,
+      "2026-10-03": null
+    },
+    "updated_at": null
+  },
+  {
+    "id": 10,
+    "full_name": "وسام علي حسين سلمان",
+    "position_title": null,
+    "category": "council",
+    "sort_order": 10,
+    "access_token": "61618806442b0aae5457e98498816d9785025241",
+    "schedule": {
+      "2026-09-30": null,
+      "2026-10-01": null,
+      "2026-10-02": null,
+      "2026-10-03": null
+    },
+    "updated_at": null
+  },
+  {
+    "id": 11,
+    "full_name": "وائل وحيد شاتي محمد",
+    "position_title": null,
+    "category": "council",
+    "sort_order": 11,
+    "access_token": "7f90ee8d3450c73d8f2e9ee65931017b007aba4d",
+    "schedule": {
+      "2026-09-30": null,
+      "2026-10-01": null,
+      "2026-10-02": null,
+      "2026-10-03": null
+    },
+    "updated_at": null
+  },
+  {
+    "id": 12,
+    "full_name": "علي صالح يوسف عبد الحسين",
+    "position_title": null,
+    "category": "council",
+    "sort_order": 12,
+    "access_token": "fb926f430e72d0b75140ac5e93f0183a6eb3d215",
+    "schedule": {
+      "2026-09-30": null,
+      "2026-10-01": null,
+      "2026-10-02": null,
+      "2026-10-03": null
+    },
+    "updated_at": null
+  },
+  {
+    "id": 13,
+    "full_name": "مهند فاضل محمد علي",
+    "position_title": null,
+    "category": "council",
+    "sort_order": 13,
+    "access_token": "d59b1bff0aee06300806e60b513494142ac9da4f",
+    "schedule": {
+      "2026-09-30": null,
+      "2026-10-01": null,
+      "2026-10-02": null,
+      "2026-10-03": null
+    },
+    "updated_at": null
+  },
+  {
+    "id": 14,
+    "full_name": "بشار مكي نعمة صالح",
+    "position_title": null,
+    "category": "council",
+    "sort_order": 14,
+    "access_token": "3a95b32a88a8db9d8e001cf5fbfe23a9c6413995",
+    "schedule": {
+      "2026-09-30": null,
+      "2026-10-01": null,
+      "2026-10-02": null,
+      "2026-10-03": null
+    },
+    "updated_at": null
+  },
+  {
+    "id": 15,
+    "full_name": "ضياء محمد خلف",
+    "position_title": null,
+    "category": "council",
+    "sort_order": 15,
+    "access_token": "2ac2cc891fe1f3efe811eaa32be3221098b0270a",
+    "schedule": {
+      "2026-09-30": null,
+      "2026-10-01": null,
+      "2026-10-02": null,
+      "2026-10-03": null
+    },
+    "updated_at": null
+  },
+  {
+    "id": 16,
+    "full_name": "آزاد محسن إبراهيم مبارك",
+    "position_title": null,
+    "category": "council",
+    "sort_order": 16,
+    "access_token": "6a956d212b046b8a7dc8f15bffffa6e65c61ef79",
+    "schedule": {
+      "2026-09-30": null,
+      "2026-10-01": null,
+      "2026-10-02": null,
+      "2026-10-03": null
+    },
+    "updated_at": null
+  },
+  {
+    "id": 17,
+    "full_name": "مهند تحرير يونس حسين",
+    "position_title": null,
+    "category": "council",
+    "sort_order": 17,
+    "access_token": "4527a4e425bd9fc8a4bbb923cbf506c5f21f83dd",
+    "schedule": {
+      "2026-09-30": null,
+      "2026-10-01": null,
+      "2026-10-02": null,
+      "2026-10-03": null
+    },
+    "updated_at": null
+  },
+  {
+    "id": 18,
+    "full_name": "عماد محمد عبود لازم",
+    "position_title": "رئيس لجنة صندوق النقابة",
+    "category": "fund_committee",
+    "sort_order": 18,
+    "access_token": "8a9c9faef575b24bdb780a17befafe093f38e0b3",
+    "schedule": {
+      "2026-09-30": null,
+      "2026-10-01": null,
+      "2026-10-02": null,
+      "2026-10-03": null
+    },
+    "updated_at": null
+  },
+  {
+    "id": 19,
+    "full_name": "منار حسين علي",
+    "position_title": "عضو لجنة صندوق النقابة",
+    "category": "fund_committee",
+    "sort_order": 19,
+    "access_token": "692a979ae2b44311aa410267b0402daf107532ff",
+    "schedule": {
+      "2026-09-30": null,
+      "2026-10-01": null,
+      "2026-10-02": null,
+      "2026-10-03": null
+    },
+    "updated_at": null
+  },
+  {
+    "id": 20,
+    "full_name": "روزا وليد علي محمد",
+    "position_title": "عضو لجنة صندوق النقابة",
+    "category": "fund_committee",
+    "sort_order": 20,
+    "access_token": "c51a5f2b688aac7264544d04282330841ecf0571",
+    "schedule": {
+      "2026-09-30": null,
+      "2026-10-01": null,
+      "2026-10-02": null,
+      "2026-10-03": null
+    },
+    "updated_at": null
+  },
+  {
+    "id": 21,
+    "full_name": "طيف طه ياسين",
+    "position_title": "أمين سر النقابة",
+    "category": "other",
+    "sort_order": 21,
+    "access_token": "432fc4618c1dfa29c2986bb22dd7f49b20baabf6",
+    "schedule": {
+      "2026-09-30": null,
+      "2026-10-01": null,
+      "2026-10-02": null,
+      "2026-10-03": null
+    },
+    "updated_at": null
+  },
+  {
+    "id": 22,
+    "full_name": "مصطفى محمد جاسم",
+    "position_title": "نائب رئيس لجنة الانضباط",
+    "category": "other",
+    "sort_order": 22,
+    "access_token": "ae02b1d68d0cd7c7ec3fec37af9b059a8680797d",
+    "schedule": {
+      "2026-09-30": null,
+      "2026-10-01": null,
+      "2026-10-02": null,
+      "2026-10-03": null
+    },
+    "updated_at": null
+  },
+  {
+    "id": 23,
+    "full_name": "عمار عبد ربه سكران",
+    "position_title": "رئيس لجنة الانضباط",
+    "category": "other",
+    "sort_order": 23,
+    "access_token": "985f78b1679d902316510bc887817b669898e225",
+    "schedule": {
+      "2026-09-30": null,
+      "2026-10-01": null,
+      "2026-10-02": null,
+      "2026-10-03": null
+    },
+    "updated_at": null
+  }
+]
