@@ -181,7 +181,14 @@ function renderEditModal() {
   const dayRows = EVENT_DATES.map(
     (date) => `
     <div style="margin-bottom:10px;">
-      <p style="font-size:12.5px;font-weight:700;margin:0 0 6px;">${DAY_LABELS[date]}</p>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+        <p style="font-size:12.5px;font-weight:700;margin:0;">${DAY_LABELS[date]}</p>
+        ${
+          editSchedule[date]
+            ? `<button type="button" class="link-btn" data-clear-day="${date}" style="color:#c0392b;padding:0;">✕ إلغاء الاختيار</button>`
+            : ''
+        }
+      </div>
       <div class="options">
         ${TYPE_OPTIONS.map(
           (opt) => `
@@ -196,8 +203,13 @@ function renderEditModal() {
   return `
     <div style="position:fixed;inset:0;background:rgba(9,38,52,.5);display:flex;align-items:center;justify-content:center;padding:16px;z-index:50;">
       <div class="card" style="max-width:480px;width:100%;max-height:85vh;overflow-y:auto;">
-        <p style="font-weight:700;margin:0 0 4px;">${member.full_name}</p>
-        <p style="color:#889;font-size:12.5px;margin:0 0 14px;">${member.position_title ?? ''}</p>
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+          <div>
+            <p style="font-weight:700;margin:0 0 4px;">${member.full_name}</p>
+            <p style="color:#889;font-size:12.5px;margin:0 0 14px;">${member.position_title ?? ''}</p>
+          </div>
+          <button type="button" id="clearAllBtn" style="background:none;border:1px solid #f3caca;color:#c0392b;border-radius:6px;font-size:11px;font-weight:700;padding:5px 8px;cursor:pointer;white-space:nowrap;">مسح الكل</button>
+        </div>
         ${dayRows}
         <div style="display:flex;gap:8px;margin-top:12px;">
           <button class="primary" id="modalSaveBtn" ${saving ? 'disabled' : ''}>${saving ? 'جارٍ الحفظ...' : 'حفظ'}</button>
@@ -244,6 +256,16 @@ function render() {
       render();
     }),
   );
+  app.querySelectorAll('[data-clear-day]').forEach((b) =>
+    b.addEventListener('click', () => {
+      editSchedule[b.dataset.clearDay] = null;
+      render();
+    }),
+  );
+  document.getElementById('clearAllBtn')?.addEventListener('click', () => {
+    for (const date of EVENT_DATES) editSchedule[date] = null;
+    render();
+  });
   document.getElementById('modalCancelBtn')?.addEventListener('click', () => {
     editingId = null;
     editSchedule = null;
@@ -253,7 +275,9 @@ function render() {
     saving = true;
     render();
     const id = editingId;
-    const days = EVENT_DATES.filter((d) => editSchedule[d]).map((event_date) => ({ event_date, attendance_type: editSchedule[event_date] }));
+    // Send all 4 dates (including cleared/null ones) so a cleared day actually
+    // overwrites the previously saved choice instead of being skipped.
+    const days = EVENT_DATES.map((event_date) => ({ event_date, attendance_type: editSchedule[event_date] ?? null }));
     try {
       await window.itexStore.updateRoster((roster) => {
         const m = roster.find((r) => r.id === id);
