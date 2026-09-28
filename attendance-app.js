@@ -77,7 +77,9 @@ setInterval(pollRoster, 15000);
 function pickPerson(id) {
   member = roster.find((m) => m.id === id);
   schedule = { ...member.schedule };
-  saved = false;
+  // Already picked something before? Go straight to the confirmation screen
+  // instead of making them click through the form again.
+  saved = EVENT_DATES.every((d) => !!schedule[d]);
   render();
 }
 
@@ -88,6 +90,13 @@ function changePerson() {
 
 function editAgain() {
   saved = false;
+  render();
+}
+
+/** Lets someone exit without choosing (or finishing) anything — still ends on
+ * a polite thank-you screen instead of leaving them stuck on the form. */
+function skipWithoutChoosing() {
+  saved = true;
   render();
 }
 
@@ -163,19 +172,31 @@ function renderPicker() {
 }
 
 function renderThankYou() {
+  const anyChosen = EVENT_DATES.some((d) => schedule[d]);
+
   const rows = EVENT_DATES.map((date) => {
     const opt = TYPE_OPTIONS.find((o) => o.value === schedule[date]);
     return `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;">
       <span>${isAr() ? DAY_LABELS[date].ar : DAY_LABELS[date].en}</span>
-      <span style="font-weight:700;">${isAr() ? opt.ar : opt.en}</span>
+      <span style="font-weight:700;${opt ? '' : 'color:#ccd;font-weight:500;'}">${
+        opt ? (isAr() ? opt.ar : opt.en) : isAr() ? 'لم يُحدَّد' : 'Not set'
+      }</span>
     </div>`;
   }).join('');
+
+  const message = anyChosen
+    ? isAr()
+      ? 'تم حفظ جدول حضورك بنجاح.'
+      : 'Your attendance schedule has been saved.'
+    : isAr()
+      ? 'تم تسجيل خروجك بدون اختيار. شكرًا لك على أي حال.'
+      : 'You exited without choosing. Thanks anyway.';
 
   return `
     <div style="text-align:center;padding:40px 16px 20px;">
       <div style="font-size:44px;line-height:1;margin-bottom:10px;">✅</div>
       <h1 style="margin-bottom:6px;">${isAr() ? `شكرًا لك، ${member.full_name.split(' ')[0]}!` : `Thank you, ${member.full_name.split(' ')[0]}!`}</h1>
-      <p class="tagline" style="margin-bottom:2px;">${isAr() ? 'تم حفظ جدول حضورك بنجاح.' : 'Your attendance schedule has been saved.'}</p>
+      <p class="tagline" style="margin-bottom:2px;">${message}</p>
       <p class="subtagline">${isAr() ? 'نشكرك على وقتك ودعمك للنقابة' : 'Thank you for your time and support'}</p>
     </div>
 
@@ -284,6 +305,9 @@ function render() {
       <button id="saveBtn" class="primary" ${!allChosen() ? 'disabled' : ''}>
         ${isAr() ? 'حفظ جدول الحضور' : 'Save attendance schedule'}
       </button>
+      <button type="button" id="skipBtn" style="background:none;border:none;color:#889;font-size:12px;font-weight:600;cursor:pointer;padding:10px;">
+        ${isAr() ? 'لا أريد الاختيار الآن، خروج' : "I don't want to choose now, exit"}
+      </button>
     </div>
   `;
 
@@ -295,6 +319,7 @@ function render() {
     });
   });
   document.getElementById('changePersonBtn')?.addEventListener('click', changePerson);
+  document.getElementById('skipBtn')?.addEventListener('click', skipWithoutChoosing);
   const saveBtn = document.getElementById('saveBtn');
   if (saveBtn) saveBtn.addEventListener('click', save);
 }
