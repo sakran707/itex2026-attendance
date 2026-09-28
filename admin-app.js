@@ -222,6 +222,32 @@ function renderEditModal() {
     </div>`;
 }
 
+function renderProgress() {
+  const registered = data.members.filter((m) => EVENT_DATES.some((d) => m.schedule[d]));
+  const remaining = data.members.filter((m) => EVENT_DATES.every((d) => !m.schedule[d]));
+
+  return `
+    <div class="card" style="margin-top:10px;">
+      <div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;">
+        <p style="font-weight:700;font-size:13.5px;margin:0;">من سجّل حضوره</p>
+        <span class="num" style="font-weight:700;color:var(--accent);">${registered.length}</span>
+        <span style="color:#889;font-size:12.5px;">من ${data.members.length}</span>
+      </div>
+      ${
+        remaining.length
+          ? `<details style="margin-top:8px;">
+              <summary style="cursor:pointer;font-size:12.5px;color:var(--ocean);font-weight:700;">
+                المتبقون بدون أي اختيار (${remaining.length})
+              </summary>
+              <ul style="margin:6px 0 0;padding-inline-start:18px;font-size:12.5px;color:#556;">
+                ${remaining.map((m) => `<li>${m.full_name}${m.position_title ? ` — ${m.position_title}` : ''}</li>`).join('')}
+              </ul>
+            </details>`
+          : `<p style="margin:8px 0 0;font-size:12.5px;color:var(--ok);font-weight:700;">✓ الجميع سجّلوا حضورهم</p>`
+      }
+    </div>`;
+}
+
 function render() {
   app.innerHTML = `
     <div class="card" style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
@@ -234,6 +260,7 @@ function render() {
         <a href="report.html?t=${Date.now()}" target="_blank" style="display:inline-flex;align-items:center;background:var(--ink);color:#fff;border-radius:8px;padding:9px 16px;font-size:13px;font-weight:700;text-decoration:none;">تصدير PDF</a>
       </div>
     </div>
+    ${renderProgress()}
     <div class="tabs" style="margin-top:14px;">
       <button data-tab="roster" class="${tab === 'roster' ? 'active' : ''}">جدول الأعضاء</button>
       <button data-tab="summary" class="${tab === 'summary' ? 'active' : ''}">الملخص اليومي</button>
