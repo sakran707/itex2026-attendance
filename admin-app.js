@@ -226,7 +226,10 @@ function render() {
         <p style="font-weight:700;font-size:13.5px;margin:0;">رابط الحضور المشترك</p>
         <p style="color:#889;font-size:12px;margin:2px 0 0;">أرسل هذا الرابط لجميع الأعضاء — كل واحد يختار اسمه بنفسه</p>
       </div>
-      <button class="primary" id="copySharedBtn" style="width:auto;padding:9px 16px;">نسخ الرابط</button>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="primary" id="copySharedBtn" style="width:auto;padding:9px 16px;">نسخ الرابط</button>
+        <a href="report.html" target="_blank" style="display:inline-flex;align-items:center;background:var(--ink);color:#fff;border-radius:8px;padding:9px 16px;font-size:13px;font-weight:700;text-decoration:none;">تصدير PDF</a>
+      </div>
     </div>
     <div class="tabs" style="margin-top:14px;">
       <button data-tab="roster" class="${tab === 'roster' ? 'active' : ''}">جدول الأعضاء</button>
