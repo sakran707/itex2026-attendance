@@ -14,6 +14,14 @@ const TYPE_OPTIONS = [
   { value: 'unavailable', ar: 'غير متاح', en: 'Unavailable', hint: '' },
 ];
 
+const CATEGORY_LABELS = {
+  leadership: { ar: 'نقيب ونائب النقيب', en: 'President & Vice President' },
+  council: { ar: 'أعضاء مجلس النقابة', en: 'Syndicate Council Members' },
+  fund_committee: { ar: 'لجنة صندوق النقابة', en: 'Fund Committee' },
+  other: { ar: 'مناصب أخرى', en: 'Other Positions' },
+};
+const CATEGORY_ORDER = ['leadership', 'council', 'fund_committee', 'other'];
+
 let lang = localStorage.getItem('itex_lang') || 'ar';
 const isAr = () => lang === 'ar';
 
@@ -26,33 +34,32 @@ function setLang(l) {
 }
 
 const app = document.getElementById('app');
-const token = new URLSearchParams(location.search).get('t');
-let schedule = {};
-let personData = null;
-let saved = false;
-
+let roster = null;
 let member = null;
+let schedule = {};
+let saved = false;
+let loadError = false;
 
 async function load() {
-  if (!token) return renderError();
   try {
-    const { roster } = await window.itexStore.fetchRosterWithSha();
-    member = roster.find((m) => m.access_token === token);
+    const res = await window.itexStore.fetchRosterWithSha();
+    roster = res.roster;
   } catch {
-    member = null;
+    loadError = true;
   }
-  if (!member) return renderError();
-  personData = { full_name: member.full_name, position_title: member.position_title };
-  schedule = { ...member.schedule };
   render();
 }
 
-function renderError() {
-  app.innerHTML = `
-    <div class="error-box">
-      <p style="font-weight:700;font-size:15px;">${isAr() ? 'رابط الحضور غير صحيح' : 'Invalid attendance link'}</p>
-      <p style="color:#889;font-size:13px;">${isAr() ? 'يرجى التأكد من الرابط الذي تم إرساله إليك.' : 'Please double-check the link that was sent to you.'}</p>
-    </div>`;
+function pickPerson(id) {
+  member = roster.find((m) => m.id === id);
+  schedule = { ...member.schedule };
+  saved = false;
+  render();
+}
+
+function changePerson() {
+  member = null;
+  render();
 }
 
 function allChosen() {
@@ -63,16 +70,19 @@ async function save() {
   const btn = document.getElementById('saveBtn');
   btn.disabled = true;
   btn.textContent = isAr() ? '...جارٍ الحفظ' : 'Saving...';
+  const id = member.id;
   const days = EVENT_DATES.map((event_date) => ({ event_date, attendance_type: schedule[event_date] }));
   try {
-    await window.itexStore.updateRoster((roster) => {
-      const m = roster.find((r) => r.access_token === token);
+    const updated = await window.itexStore.updateRoster((r) => {
+      const m = r.find((x) => x.id === id);
       if (m) {
         for (const { event_date, attendance_type } of days) m.schedule[event_date] = attendance_type;
         m.updated_at = new Date().toISOString();
       }
-      return roster;
+      return r;
     });
+    roster = updated;
+    member = roster.find((m) => m.id === id);
     saved = true;
   } catch {
     saved = false;
@@ -82,8 +92,59 @@ async function save() {
   render();
 }
 
+function renderPicker() {
+  const groups = CATEGORY_ORDER.map((cat) => ({
+    cat,
+    members: roster.filter((m) => m.category === cat).sort((a, b) => a.sort_order - b.sort_order),
+  })).filter((g) => g.members.length);
+
+  return `
+    <div style="text-align:center;margin-bottom:18px;">
+      <h1>${isAr() ? 'تنظيم حضور أعضاء نقابة المبرمجين العراقيين' : 'Iraqi Programmers Syndicate — ITEX 2026 Attendance'}</h1>
+      <p class="tagline">${isAr() ? 'معرض ITEX 2026 – معرض بغداد الدولي' : 'ITEX 2026 – Baghdad International Fair'}</p>
+      <p class="subtagline">${isAr() ? 'بوث نقابة المبرمجين العراقيين' : 'Iraqi Programmers Syndicate booth'}</p>
+    </div>
+    <div class="card" style="margin-bottom:18px;">
+      <p style="font-weight:700;font-size:14px;margin:0;">${isAr() ? 'اختر اسمك من القائمة' : 'Select your name from the list'}</p>
+    </div>
+    ${groups
+      .map(
+        (g) => `
+      <p class="group-title">${isAr() ? CATEGORY_LABELS[g.cat].ar : CATEGORY_LABELS[g.cat].en}</p>
+      <div class="card" style="padding:6px;">
+        ${g.members
+          .map(
+            (m) => `
+          <button type="button" class="person-pick" data-id="${m.id}" style="display:block;width:100%;text-align:${isAr() ? 'right' : 'left'};background:none;border:none;border-bottom:1px solid var(--border);padding:12px 10px;font-size:13.5px;font-weight:600;color:var(--ink);cursor:pointer;">
+            ${m.full_name}${m.position_title ? `<br><span style="font-weight:500;font-size:12px;color:#889;">${m.position_title}</span>` : ''}
+          </button>`,
+          )
+          .join('')}
+      </div>`,
+      )
+      .join('')}
+  `;
+}
+
+function renderError() {
+  app.innerHTML = `
+    <div class="error-box">
+      <p style="font-weight:700;font-size:15px;">${isAr() ? 'تعذر تحميل البيانات' : 'Could not load data'}</p>
+      <p style="color:#889;font-size:13px;">${isAr() ? 'يرجى تحديث الصفحة والمحاولة مرة أخرى.' : 'Please refresh the page and try again.'}</p>
+    </div>`;
+}
+
 function render() {
-  if (!personData) return;
+  if (loadError) return renderError();
+  if (!roster) return;
+
+  if (!member) {
+    app.innerHTML = renderPicker();
+    app.querySelectorAll('.person-pick').forEach((btn) => {
+      btn.addEventListener('click', () => pickPerson(Number(btn.dataset.id)));
+    });
+    return;
+  }
 
   const dayCards = EVENT_DATES.map((date) => {
     const opts = TYPE_OPTIONS.map((opt) => {
@@ -106,8 +167,13 @@ function render() {
     </div>
 
     <div class="card">
-      <p class="person-name">${personData.full_name}</p>
-      ${personData.position_title ? `<p class="person-role">${personData.position_title}</p>` : ''}
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;">
+        <div>
+          <p class="person-name">${member.full_name}</p>
+          ${member.position_title ? `<p class="person-role">${member.position_title}</p>` : ''}
+        </div>
+        <button type="button" id="changePersonBtn" style="background:none;border:none;color:var(--ocean);font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;">${isAr() ? 'لست أنا' : 'Not me'}</button>
+      </div>
       <p class="hours-note">${isAr() ? 'وقت المعرض: 10:00 صباحاً – 8:00 مساءً' : 'Fair hours: 10:00 AM – 8:00 PM'}</p>
     </div>
 
@@ -129,6 +195,7 @@ function render() {
       render();
     });
   });
+  document.getElementById('changePersonBtn')?.addEventListener('click', changePerson);
   const saveBtn = document.getElementById('saveBtn');
   if (saveBtn) saveBtn.addEventListener('click', save);
 }

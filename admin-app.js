@@ -96,9 +96,9 @@ async function loadData() {
   }
 }
 
-function copyLink(token) {
+function copySharedLink() {
   const base = location.pathname.replace(/admin\.html$/, '');
-  const url = `${location.origin}${base}?t=${token}`;
+  const url = `${location.origin}${base}`;
   navigator.clipboard.writeText(url).then(() => alert('تم نسخ الرابط'));
 }
 
@@ -133,7 +133,6 @@ function renderRoster() {
               ${EVENT_DATES.map((d) => `<td>${badge(m.schedule[d])}</td>`).join('')}
               <td style="color:#aab;">${m.updated_at ? new Date(m.updated_at).toLocaleDateString('ar-IQ') : '—'}</td>
               <td style="white-space:nowrap;">
-                <button class="link-btn" data-token="${m.access_token}">نسخ الرابط</button>
                 <button class="link-btn" data-edit="${m.id}">تعديل</button>
               </td>
             </tr>`,
@@ -210,20 +209,27 @@ function renderEditModal() {
 
 function render() {
   app.innerHTML = `
-    <div class="tabs">
+    <div class="card" style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+      <div>
+        <p style="font-weight:700;font-size:13.5px;margin:0;">رابط الحضور المشترك</p>
+        <p style="color:#889;font-size:12px;margin:2px 0 0;">أرسل هذا الرابط لجميع الأعضاء — كل واحد يختار اسمه بنفسه</p>
+      </div>
+      <button class="primary" id="copySharedBtn" style="width:auto;padding:9px 16px;">نسخ الرابط</button>
+    </div>
+    <div class="tabs" style="margin-top:14px;">
       <button data-tab="roster" class="${tab === 'roster' ? 'active' : ''}">جدول الأعضاء</button>
       <button data-tab="summary" class="${tab === 'summary' ? 'active' : ''}">الملخص اليومي</button>
     </div>
     ${tab === 'roster' ? renderRoster() : renderSummary()}
     ${renderEditModal()}
   `;
+  document.getElementById('copySharedBtn')?.addEventListener('click', copySharedLink);
   app.querySelectorAll('.tabs button').forEach((b) =>
     b.addEventListener('click', () => {
       tab = b.dataset.tab;
       render();
     }),
   );
-  app.querySelectorAll('.link-btn[data-token]').forEach((b) => b.addEventListener('click', () => copyLink(b.dataset.token)));
   app.querySelectorAll('.link-btn[data-edit]').forEach((b) =>
     b.addEventListener('click', () => {
       editingId = Number(b.dataset.edit);
