@@ -41,7 +41,7 @@ let saveRetryAttempt = 0;
 const SESSION_KEY = 'itex_admin_session';
 
 function checkSession() {
-  if (sessionStorage.getItem(SESSION_KEY) === '1') {
+  if (localStorage.getItem(SESSION_KEY) === '1') {
     logoutBtn.style.display = 'inline-block';
     loadData();
   } else {
@@ -61,7 +61,7 @@ function renderLogin(error) {
   document.getElementById('loginBtn').addEventListener('click', () => {
     const password = document.getElementById('pw').value;
     if (password === ADMIN_PASSWORD) {
-      sessionStorage.setItem(SESSION_KEY, '1');
+      localStorage.setItem(SESSION_KEY, '1');
       logoutBtn.style.display = 'inline-block';
       loadData();
     } else {
@@ -314,7 +314,7 @@ function render() {
 }
 
 logoutBtn.addEventListener('click', () => {
-  sessionStorage.removeItem(SESSION_KEY);
+  localStorage.removeItem(SESSION_KEY);
   renderLogin();
 });
 

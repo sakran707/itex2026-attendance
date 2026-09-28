@@ -1,5 +1,5 @@
 const SESSION_KEY = 'itex_admin_session';
-if (sessionStorage.getItem(SESSION_KEY) !== '1') {
+if (localStorage.getItem(SESSION_KEY) !== '1') {
   location.href = 'admin.html';
 }
 
