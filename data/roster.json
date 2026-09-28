@@ -37,12 +37,12 @@
     "sort_order": 3,
     "access_token": "8bab4bf7cc3ea0026031ac1ee1271b047d3ccf66",
     "schedule": {
-      "2026-09-30": null,
-      "2026-10-01": null,
-      "2026-10-02": null,
-      "2026-10-03": null
+      "2026-09-30": "unavailable",
+      "2026-10-01": "unavailable",
+      "2026-10-02": "unavailable",
+      "2026-10-03": "evening"
     },
-    "updated_at": null
+    "updated_at": "2026-09-28T16:53:22.601Z"
   },
   {
     "id": 4,
