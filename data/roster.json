@@ -457,11 +457,11 @@
     "sort_order": 31,
     "access_token": "69a3a35536e2942717acb3d99639fbafa2534f1b",
     "schedule": {
-      "2026-09-30": null,
-      "2026-10-01": null,
-      "2026-10-02": null,
-      "2026-10-03": null
+      "2026-09-30": "evening",
+      "2026-10-01": "unavailable",
+      "2026-10-02": "morning",
+      "2026-10-03": "morning"
     },
-    "updated_at": null
+    "updated_at": "2026-09-30T19:44:49.174Z"
   }
 ]
