@@ -382,12 +382,12 @@
     "sort_order": 26,
     "access_token": "5344367219f5bd0417a0ea9a420dffeb2eaf9c6b",
     "schedule": {
-      "2026-09-30": null,
-      "2026-10-01": null,
-      "2026-10-02": null,
-      "2026-10-03": null
+      "2026-09-30": "full_day",
+      "2026-10-01": "full_day",
+      "2026-10-02": "full_day",
+      "2026-10-03": "full_day"
     },
-    "updated_at": null
+    "updated_at": "2026-09-30T19:29:46.064Z"
   },
   {
     "id": 27,
