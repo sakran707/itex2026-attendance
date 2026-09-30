@@ -343,5 +343,95 @@
       "2026-10-03": null
     },
     "updated_at": "2026-09-28T13:35:31.513Z"
+  },
+  {
+    "id": 24,
+    "full_name": "روان عدنان خضير",
+    "position_title": "مديرة مكتب النقيب",
+    "category": "other",
+    "sort_order": 24,
+    "access_token": "7113b4b8e2cff24b2553507fbed003fdc9cfaff3",
+    "schedule": {
+      "2026-09-30": null,
+      "2026-10-01": null,
+      "2026-10-02": null,
+      "2026-10-03": null
+    },
+    "updated_at": null
+  },
+  {
+    "id": 25,
+    "full_name": "لبنى عصام عادل",
+    "position_title": "مكتب النقيب",
+    "category": "other",
+    "sort_order": 25,
+    "access_token": "057b976fe6626f3741d4a2f9bc6a25d2619105fd",
+    "schedule": {
+      "2026-09-30": null,
+      "2026-10-01": null,
+      "2026-10-02": null,
+      "2026-10-03": null
+    },
+    "updated_at": null
+  },
+  {
+    "id": 26,
+    "full_name": "مهند فتاح صالح",
+    "position_title": "المكتب الاعلامي",
+    "category": "other",
+    "sort_order": 26,
+    "access_token": "5344367219f5bd0417a0ea9a420dffeb2eaf9c6b",
+    "schedule": {
+      "2026-09-30": null,
+      "2026-10-01": null,
+      "2026-10-02": null,
+      "2026-10-03": null
+    },
+    "updated_at": null
+  },
+  {
+    "id": 27,
+    "full_name": "عبيده محمد ذنون",
+    "position_title": "مدير المكتب الاعلامي",
+    "category": "other",
+    "sort_order": 27,
+    "access_token": "2a8add27202ab5cdfc0db5fa8dc67d7775471408",
+    "schedule": {
+      "2026-09-30": null,
+      "2026-10-01": null,
+      "2026-10-02": null,
+      "2026-10-03": null
+    },
+    "updated_at": null
+  },
+  {
+    "id": 28,
+    "full_name": "محمد كريم مذكور",
+    "position_title": "الحسابات",
+    "category": "other",
+    "sort_order": 28,
+    "access_token": "0251e74ac0f6934b63899b105b5badce796a0ae1",
+    "schedule": {
+      "2026-09-30": null,
+      "2026-10-01": null,
+      "2026-10-02": null,
+      "2026-10-03": null
+    },
+    "updated_at": null
+  },
+  {
+    "id": 29,
+    "full_name": "كرار عبد نصر",
+    "position_title": "الحسابات",
+    "category": "other",
+    "sort_order": 29,
+    "access_token": "f17011ade3777fe19d661cf96a4373b0b1af53ad",
+    "schedule": {
+      "2026-09-30": null,
+      "2026-10-01": null,
+      "2026-10-02": null,
+      "2026-10-03": null
+    },
+    "updated_at": null
   }
 ]
